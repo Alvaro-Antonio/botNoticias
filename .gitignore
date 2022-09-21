@@ -1,8 +1,6 @@
 # arquivo para ser alterado por quem usar no chat e que não deve ser valor público no repositório
 .urlRoomChat.py
 
-
-
 .idea
 # Byte-compiled / optimized / DLL files
 __pycache__/
