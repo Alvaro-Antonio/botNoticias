@@ -8,20 +8,70 @@ from json import dumps
 from httplib2 import Http
 
 try:
+    print("Capturando Noticias...\n")
     html = urlopen("https://g1.globo.com/tecnologia/")
 except HTTPError as e:
     print(e)
 except URLError:
     print("Server down or incorrect domain")
 else:
+    print("Capturando informações...\n")
     res = BeautifulSoup(html.read(), "html5lib")
     tags = res.findAll("a", {"class": "feed-post-link"})
-    links = res.findAll('a', href=True)
-    titulos = ""
+    
+    resumes = res.findAll('div',{"class" : "feed-post-body-resumo"})
+  
+    pictures = res.findAll('img', {"class" : "bstn-fd-picture-image"})
+    
+
+    cards = []
+
+    lenth = 0
+
+    print("Processando Noticias...\n")
 
     for tag in tags:
-        print(tag.getText())
-        titulos += "<" + tag['href'] + "|"+tag.getText() + ">\n\n"
+        print(f'Noticía {lenth + 1} \n')
+
+        title = "<a" + tag['href'] + "><h1 color=blue >"+tag.getText() + "</h1></a>"
+        subtitle = ""
+
+        try:
+            subtitle =resumes[lenth].p.string
+        except:
+            subtitle = ""
+
+        image = pictures[lenth]['src']
+        altImage = pictures[lenth]['alt']
+
+        card = {
+                "cardId": title,
+                "card": {                    
+                    "sections": [
+                      {
+                        "header": title,
+                        "collapsible": False,
+                        "uncollapsibleWidgetsCount": 1,
+                        "widgets": [
+                          {
+                            "textParagraph": {
+                              "text":  "<i>" + subtitle + "</i>" 
+                            }
+                          },
+                          {
+                            "image": {
+                              "imageUrl": image,
+                              "altText": altImage
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                },
+              }
+
+        cards.append(card)
+        lenth += 1
 
     """webhook do chat."""
 
@@ -30,14 +80,26 @@ else:
     url = urlPath
 
     bot_message = {
-        'text': titulos,
+      "cardsV2": [
+      ],
     }
+    print("Montando Cards de Noticias...\n")
+    for c in cards:
+      bot_message["cardsV2"].append(c)
+
+
+    #print(bot_message)  
+
     message_headers = {'Content-Type': 'application/json; charset=UTF-8'}
     http_obj = Http()
+
+    print("Enviando ...\n")
+
     response = http_obj.request(
         uri=url,
         method='POST',
         headers=message_headers,
         body=dumps(bot_message),
     )
-    print(response)
+    #print(response)
+    print("Finalizado...")
