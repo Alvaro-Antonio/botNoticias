@@ -33,7 +33,7 @@ else:
     for tag in tags:
         print(f'Noticía {lenth + 1} \n')
 
-        title = "<a" + tag['href'] + "><h1 color=blue >"+tag.getText() + "</h1></a>"
+        title = "<a href=\"" + tag['href'] + "\" ><h1 color=blue >"+tag.getText() + "</h1></a>"
         subtitle = ""
 
         try:
@@ -51,7 +51,7 @@ else:
                       {
                         "header": title,
                         "collapsible": False,
-                        "uncollapsibleWidgetsCount": 1,
+                        "uncollapsibleWidgetsCount": 0,
                         "widgets": [
                           {
                             "textParagraph": {
